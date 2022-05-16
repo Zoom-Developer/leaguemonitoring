@@ -93,7 +93,7 @@ def get_gamedata(gameId):
     return game['info']
 
 def listener():
-    print("[AHEGAO] Listening")
+    print("Listening")
     games = {}
     games_blacklist = {}
     while True:
