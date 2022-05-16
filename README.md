@@ -1,7 +1,7 @@
 <h1>League Monitoring</h1>
 <h3>A tool to keep track of your friends' games and post that information to your discord server.</h3>
 
-***Bot-Setup***
+***Bot-Setup***<br>
 *-  Create a discord application and generate a token (https://discord.com/developers/applications)*<br>
 *-  Create a league of legens application and generate a token (https://developer.riotgames.com/)*<br>
 *-  Download League Monitoring (git clone https://github.com/Zoom-Developer/leaguemonitoring)*<br>
@@ -9,14 +9,14 @@
 *-  In config.py in USERS write a user dict of the format {"name": {"id": "USER_DISCORD_ID"}, "name2": {"id": "USER_DISCORD_ID2"}}*<br>
 *-  Download python requirenmets and run the bot*
 
-***Commands***
+***Commands***<br>
 *!online  -   Current list of users in the game*<br>
 *!free  -   Current List of Free Champions*<br>
 *!top  -   Users top (unstable)*<br>
 
-***Attention***
+***Attention***<br>
 *Due to the small number of allowed requests to the league api per minute, sometimes, very rarely, the bot can stop working for about 1 minute, the !top command sends a huge number of requests, so its abuse can put the bot down for a while.*<br>
 
-*The original bot was written for the Russian community, so it has Russian localization. You can do the translation yourself.*<br>
+*The original bot was written for the Russian community, so it has Russian localization. You can do the translation yourself.*<br><br>
 
 <h3>Initially, the bot was written for a small group of people, but I decided to open its source code for everyone, good luck in using it)</h3>
