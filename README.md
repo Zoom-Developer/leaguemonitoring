@@ -7,7 +7,7 @@
 *-  Download League Monitoring (git clone https://github.com/Zoom-Developer/leaguemonitoring)*<br>
 *-  Open config.py and write discord token to DISCORD_TOKEN and riot api token to RIOT_TOKEN, and also write log channel id in your discord server to LOG_CHANNEL*<br>
 *-  In config.py in USERS write a user dict of the format {"name": {"id": "USER_DISCORD_ID"}, "name2": {"id": "USER_DISCORD_ID2"}}*<br>
-*-  Download python requirenmets and run the bot*
+*-  Download python requirenmets (pip install -r requirements.txt) and run the bot*
 
 ***Commands***<br>
 *!online  -   Current list of users in the game*<br>
