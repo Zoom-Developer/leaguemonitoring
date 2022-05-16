@@ -1,0 +1,4 @@
+discord.py
+requests
+zoomtools
+discord_components
