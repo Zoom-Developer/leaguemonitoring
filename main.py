@@ -1,7 +1,5 @@
 import requests, discord, re, time, threading, copy, zoomtools, datetime
-from numba import jit
 from discord_components import DiscordComponents, Button, ButtonStyle
-import xml.etree.ElementTree as ET
 from config import *
 
 client = discord.Client()
@@ -20,15 +18,7 @@ def get_data():
     for (name, data) in players.items():
         try:
             game = request("https://ru.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/%s" % data['id'])
-            if 'status' in game: 
-                if 'steam' in data:F
-                    xml = ET.fromstring(requests.get(data['steam'] + '?xml=1').content, parser=ET.XMLParser(encoding = 'utf-8'))
-                    if xml.find("onlineState").text != "offline": 
-                        if xml.find("onlineState").text == 'in-game':
-                            data['in_steam'] = "Играет в \"%s\"" % xml.find("inGameInfo/gameName").text
-                            data["game_icon"] = xml.find("inGameInfo/gameIcon").text
-                        else: data['in_steam'] = xml.find("stateMessage").text
-                        data['icon'] = xml.find("avatarIcon").text
+            if 'status' in game:
                 data['in_game'] = False
                 continue
             data['in_game'] = True
@@ -149,7 +139,6 @@ async def on_message(message):
         for (name, info) in get_data().items():
             #if not info['in_game']: embeds.append({"color": 13305350, "author": { "name": name }, "footer": {"text": "НЕ В ИГРЕ"} })
             if info['in_game']: embeds.append({"color": 6544914, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % info['icon'] }, "description": f"**{GAME_MODES[info['mode']]}**\n*Играет за:* **{CHAMPIONS[info['champion']]['name']}**\n*Уже:* **{get_time(info['length'])}** *(~ {get_time(info['length'] + 60*4)})*\n*ID Игры:* **{info['game_id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
-            elif 'in_steam' in info: embeds.append({"color": 1054698, "thumbnail": {"url": info['game_icon'] if 'game_icon' in info else ""}, "author": { "name": name, "url": info['steam'], "icon_url": info['icon']}, "description": "*%s*" % info['in_steam'], "footer": {"text": "STEAM"} })
         if not embeds: embeds.append({"color": 13305350, "description": "Люди в игре отсутствуют" })
         requests.patch("https://discordapp.com/api/v6/channels/%s/messages/%s" % (message.channel.id, id), json={"embeds": embeds, "content": "> ⚠ Информация о Лиге Легенд доходит c задержкой около 4 минут"}, headers={"Authorization": "Bot " + DISCORD_TOKEN})
     elif message.content.lower() == "!free":
