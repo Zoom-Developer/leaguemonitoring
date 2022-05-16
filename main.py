@@ -16,12 +16,12 @@ def request(url, json={}, headers={}):
 def get_time(t):  return time.strftime("%M:%S", time.localtime(t))
     
 def get_data():
-    players = copy.deepcopy(AHEGAO_USERS)
+    players = copy.deepcopy(USERS)
     for (name, data) in players.items():
         try:
             game = request("https://ru.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/%s" % data['id'])
             if 'status' in game: 
-                if 'steam' in data:
+                if 'steam' in data:F
                     xml = ET.fromstring(requests.get(data['steam'] + '?xml=1').content, parser=ET.XMLParser(encoding = 'utf-8'))
                     if xml.find("onlineState").text != "offline": 
                         if xml.find("onlineState").text == 'in-game':
@@ -39,7 +39,7 @@ def get_data():
             data['icon'] = str(list(filter(lambda player: player['summonerId'] == data['id'], game['participants']))[0]['profileIconId'])
             data['champion'] = str(list(filter(lambda player: player['summonerId'] == data['id'], game['participants']))[0]['championId'])
         except Exception as err:
-            print("[AHEGAO] %s" % err)
+            print(err)
             data['in_game'] = False
     return players
 
@@ -49,7 +49,7 @@ def get_games(count=20, new=False, old=False):
     if time.time() - last_games["updated"] < 20 and not required_new or old: return copy.deepcopy(last_games["games"])
     games = []
     games_ids = []
-    for (_, data) in AHEGAO_USERS.items():
+    for (_, data) in USERS.items():
         try:
             puuid = request("https://ru.api.riotgames.com/lol/summoner/v4/summoners/%s" % data['id'])['puuid']
             games_ids += request("https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?count=%s" % (puuid, count))
@@ -64,7 +64,7 @@ def get_games(count=20, new=False, old=False):
 
 def get_top(top_type, games_count=20, old=False, new=False):
     games = filter(lambda x: x['gameType'] == "MATCHED_GAME", get_games(count=games_count, old=old, new=new))
-    top = copy.deepcopy(AHEGAO_USERS)
+    top = copy.deepcopy(USERS)
     for game in games:
         for (name, user) in top.items():
             player = list(filter(lambda player: player['summonerId'] == user['id'], game['participants']))
@@ -138,7 +138,7 @@ def listener():
 @client.event
 async def on_ready(): 
     DiscordComponents(client)
-    print("[AHEGAO] Discord logined")
+    print("Discord logined")
     
 @client.event
 async def on_message(message):
