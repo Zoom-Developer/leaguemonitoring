@@ -4,8 +4,9 @@ from config import *
 
 client = discord.Client()
 
-ITEMS = requests.get("https://ddragon.leagueoflegends.com/cdn/12.4.1/data/ru_RU/item.json").json()['data']
-CHAMPIONS = dict(([champ['key'], {"name": champ['name'], "icon": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/champion/%s" % champ['image']['full']}] for (_, champ) in requests.get("https://ddragon.leagueoflegends.com/cdn/12.4.1/data/ru_RU/champion.json").json()['data'].items()))
+DDRAGON_VERSION = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()[0]
+ITEMS = requests.get("https://ddragon.leagueoflegends.com/cdn/%s/data/ru_RU/item.json" % DDRAGON_VERSION).json()['data']
+CHAMPIONS = dict(([champ['key'], {"name": champ['name'], "icon": "https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s" % (DDRAGON_VERSION, champ['image']['full'])}] for (_, champ) in requests.get("https://ddragon.leagueoflegends.com/cdn/%s/data/ru_RU/champion.json" % DDRAGON_VERSION).json()['data'].items()))
 
 def request(url, json={}, headers={}):
     headers['X-Riot-Token'] = RIOT_TOKEN
@@ -80,7 +81,7 @@ def get_top(top_type, games_count=20, old=False, new=False):
                     changed = True
             if changed:
                 user["gameId"] = game["gameId"]
-                user["icon"] = "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % player["profileIcon"]
+                user["icon"] = "https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%s.png" % (DDRAGON_VERSION, player["profileIcon"])
                 user["champion"] = player['championId']
                 user["created"] = game["gameCreation"] / 1000
     print(top)
@@ -104,14 +105,14 @@ def listener():
             if name not in games and info['in_game']:
                 if name in games_blacklist: games_blacklist[name].append(info['game_id'])
                 else: games_blacklist[name] = [info['game_id']]
-                games[name] = {"id": info['game_id'], "icon": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % info['icon'], "champion": info['champion']}
-                embeds.append({"color": 15387920, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % info['icon'] }, "description": f"*Вошёл в игру:* **{GAME_MODES[info['mode']]}**\n*Персонаж:* **{CHAMPIONS[info['champion']]['name']}**\n*ID Игры*: **{info['game_id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
+                games[name] = {"id": info['game_id'], "icon": "https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%s.png" % (DDRAGON_VERSION, info['icon']), "champion": info['champion']}
+                embeds.append({"color": 15387920, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%s.png" % (DDRAGON_VERSION, info['icon']) }, "description": f"*Вошёл в игру:* **{GAME_MODES[info['mode']]}**\n*Персонаж:* **{CHAMPIONS[info['champion']]['name']}**\n*ID Игры*: **{info['game_id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
             if name in games and info['in_game']:
                 if games[name]['id'] != info['game_id']: 
                     if name in games_blacklist: games_blacklist[name].append(info['game_id'])
                     else: games_blacklist[name] = [info['game_id']]
-                    games[name] = {"id": info['game_id'], "icon": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % info['icon'], "champion": info['champion']}
-                    embeds.append({"color": 15387920, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % info['icon'] }, "description": f"*Вошёл в игру:* **{GAME_MODES[info['mode']]}**\n*Персонаж:* **{CHAMPIONS[info['champion']]['name']}**\n*ID Игры*: **{info['id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
+                    games[name] = {"id": info['game_id'], "icon": "https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%s.png" % (DDRAGON_VERSION, info['icon']), "champion": info['champion']}
+                    embeds.append({"color": 15387920, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%s.png" % (DDRAGON_VERSION, info['icon']) }, "description": f"*Вошёл в игру:* **{GAME_MODES[info['mode']]}**\n*Персонаж:* **{CHAMPIONS[info['champion']]['name']}**\n*ID Игры*: **{info['id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
             if name in games: game = get_gamedata(games[name]['id'])
             else: game = False
             if game: 
@@ -138,7 +139,7 @@ async def on_message(message):
         embeds = []
         for (name, info) in get_data().items():
             #if not info['in_game']: embeds.append({"color": 13305350, "author": { "name": name }, "footer": {"text": "НЕ В ИГРЕ"} })
-            if info['in_game']: embeds.append({"color": 6544914, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/12.4.1/img/profileicon/%s.png" % info['icon'] }, "description": f"**{GAME_MODES[info['mode']]}**\n*Играет за:* **{CHAMPIONS[info['champion']]['name']}**\n*Уже:* **{get_time(info['length'])}** *(~ {get_time(info['length'] + 60*4)})*\n*ID Игры:* **{info['game_id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
+            if info['in_game']: embeds.append({"color": 6544914, "thumbnail": {"url": CHAMPIONS[info['champion']]['icon']}, "author": { "name": name, "icon_url": "https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%s.png" %  (DDRAGON_VERSION, info['icon']) }, "description": f"**{GAME_MODES[info['mode']]}**\n*Играет за:* **{CHAMPIONS[info['champion']]['name']}**\n*Уже:* **{get_time(info['length'])}** *(~ {get_time(info['length'] + 60*4)})*\n*ID Игры:* **{info['game_id']}**", "footer": { "text": GAME_TYPES[info['type']] }})
         if not embeds: embeds.append({"color": 13305350, "description": "Люди в игре отсутствуют" })
         requests.patch("https://discordapp.com/api/v6/channels/%s/messages/%s" % (message.channel.id, id), json={"embeds": embeds, "content": "> ⚠ Информация о Лиге Легенд доходит c задержкой около 4 минут"}, headers={"Authorization": "Bot " + DISCORD_TOKEN})
     elif message.content.lower() == "!free":
